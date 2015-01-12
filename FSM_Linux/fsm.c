@@ -195,7 +195,7 @@ struct state_action p_FSM[NUM_STATE][NUM_EVENT] = {
 	// - DATA_sending 
 	{ { NULL, DATA_sending }, { NULL, DATA_sending }, { stop_resending, CONNECTED }, { report_data, CONNECTED },
 	{ NULL, DATA_sending }, { close_con, wait_CON }, { NULL, DATA_sending }, { resend_data, DATA_sending },
-	{ stop_resending, CONNECTED } },
+	{ stop_resending, wait_CON } },
 };
 
 int data_count = 0;
