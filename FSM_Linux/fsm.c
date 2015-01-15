@@ -1,21 +1,21 @@
 //
 // fsm.c
 //
-// Created by Minsuk Lee, 2014.11.1.
-// Updated by Younggi YUN, 2015. 1. 10
+// Created by Minsuk Lee,  2014. 11.  1.
+// Updated by Younggi Yun, 2015.  1. 10.
 // Copyright (c) 2014. Minsuk Lee All rights reserved.
 // see LICENSE
 
 #include "util.h"
 
-#define CONNECT_TIMEOUT      1
-#define SENDING_DATA_TIMEOUT 2
+#define CONNECT_TIMEOUT      3
+#define SENDING_DATA_TIMEOUT 3
 #define RANGE_OF_RESENDING   3
 
 #define NUM_STATE   4
 #define NUM_EVENT   9
 
-enum pakcet_type { F_CON = 0, F_FIN = 1, F_ACK = 2, F_DATA = 3 };                  // Packet Type
+enum pakcet_type { F_CON = 0, F_FIN = 1, F_ACK = 2, F_DATA = 3 };                   // Packet Type
 enum proto_state { wait_CON = 0, CON_sent = 1, CONNECTED = 2, DATA_sending = 3 };   // States
 
 // Events
@@ -25,24 +25,24 @@ enum proto_event {
 };
 
 char *pkt_name[] = { "F_CON", "F_FIN", "F_ACK", "F_DATA" };
-char *st_name[] = { "wait_CON", "CON_sent", "CONNECTED", "CON_sending" };
+char *st_name[] = { "wait_CON", "CON_sent", "CONNECTED", "DATA_sending" };
 char *ev_name[] = { "RCV_CON", "RCV_FIN", "RCV_ACK", "RCV_DATA",
 "CONNECT", "CLOSE", "SEND", "TIMEOUT", "TIMEOUT_SENDING" };
 
-struct state_action {            // Protocol FSM Structure
+struct state_action {              // Protocol FSM Structure
 	void(*action)(void *p);
 	enum proto_state next_state;
 };
 
 #define MAX_DATA_SIZE   (500)
 
-struct packet {                  // 504 Byte Packet to & from Simulator
-	unsigned short type;         // enum packet_type
+struct packet {                    // 504 Byte Packet to & from Simulator
+	unsigned short type;           // enum packet_type
 	unsigned short size;
 	char data[MAX_DATA_SIZE];
 };
 
-struct p_event {                 // Event Structure
+struct p_event {                   // Event Structure
 	enum proto_event event;
 	struct packet packet;
 	int size;
@@ -195,7 +195,7 @@ struct state_action p_FSM[NUM_STATE][NUM_EVENT] = {
 	// - DATA_sending 
 	{ { NULL, DATA_sending }, { NULL, DATA_sending }, { stop_resending, CONNECTED }, { report_data, CONNECTED },
 	{ NULL, DATA_sending }, { close_con, wait_CON }, { NULL, DATA_sending }, { resend_data, DATA_sending },
-	{ stop_resending, wait_CON } },
+	{ close_con, wait_CON } },
 };
 
 int data_count = 0;
